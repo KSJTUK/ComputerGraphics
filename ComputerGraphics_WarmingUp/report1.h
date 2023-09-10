@@ -3,6 +3,7 @@
 #include <iostream>
 #include <random>
 #include <vector> 
+#include <cstdlib>
 
 std::random_device rd;
 std::default_random_engine dre{ rd() };
@@ -14,39 +15,7 @@ int getRand(int min, int max)
 	return uid(dre);
 }
 
-int solution1()
-{
 
-	//
-	//while (true) {
-	//	char c{ };
-	//	std::cin >> c;
-
-	//	if (isdigit(c)) {
-	//		int r = static_cast<int>(c - 48);
-	//		if (r > 9 or r < 1) {
-	//			std::cout << "숫자가 너무 크거나 작습니다." << std::endl;
-	//			continue;
-	//		}
-
-	//		mat1.print();
-	//		std::cout << "* 2 = " << std::endl;
-	//		mat1 *= r;
-	//		mat1.print();
-	//		continue;
-	//	}
-
-	//	switch (c) {
-	//	case 'm':
-	//		break;
-	//	case 'a':
-	//		break;
-	//	case 'd':
-	//		break;
-
-	//	}
-	//}
-}
 
 class Matrix {
 private:
@@ -91,6 +60,12 @@ public:
 
 
 public:
+	void reCreate() {
+		Matrix newMat{ matSize };
+		matrix.clear();
+		matrix = newMat.matrix;
+	}
+
 	void print() const {
 		for (int i = 0; i < matSize; ++i) {
 			for (int j = 0; j < matSize; ++j) {
@@ -100,16 +75,14 @@ public:
 		}
 	}
 
-	void printOper(const Matrix& other, const std::string& oper)
+	void printOper(const Matrix& other)
 	{
 		for (int i = 0; i < matSize; ++i) {
 			for (int j = 0; j < matSize; ++j) {
 				std::cout << matrix[i][j] << " ";
 			}
-
-			if (!oper.empty() and ((matSize % 2 + 1) == i)) {
-				std::cout << oper << " ";
-			}
+			
+			std::cout << "   ";
 
 			for (int j = 0; j < matSize; ++j) {
 				std::cout << other.matrix[i][j] << " ";
@@ -119,20 +92,24 @@ public:
 		}
 	}
 
-	void operator+(const Matrix& other) {
+	Matrix operator+(const Matrix& other) {
+		Matrix newMat{ matSize };
 		for (int i = 0; i < matSize; ++i) {
 			for (int j = 0; j < matSize; ++j) {
-				matrix[i][j] += other.matrix[i][j];
+				newMat.matrix[i][j] = matrix[i][j] + other.matrix[i][j];
 			}
 		}
+		return newMat;
 	}
 
-	void operator-(const Matrix& other) {
+	Matrix operator-(const Matrix& other) {
+		Matrix newMat{ matSize };
 		for (int i = 0; i < matSize; ++i) {
 			for (int j = 0; j < matSize; ++j) {
-				matrix[i][j] -= other.matrix[i][j];
+				newMat.matrix[i][j] = matrix[i][j] - other.matrix[i][j];
 			}
 		}
+		return newMat;
 	}
 
 	void operator*=(const Matrix& other) {
@@ -143,6 +120,18 @@ public:
 				}
 			}
 		}
+	}
+
+	Matrix operator*(const Matrix& other) {
+		Matrix newMat{ matSize, 0 };
+		for (int i = 0; i < matSize; ++i) {
+			for (int j = 0; j < matSize; ++j) {
+				for (int k = 0; k < matSize; ++k) {
+					newMat.matrix[i][j] += matrix[i][k] * other.matrix[k][j];
+				}
+			}
+		}
+		return newMat;
 	}
 
 	void Trans() {
@@ -273,3 +262,87 @@ private:
 		}
 	}
 };
+
+int solution1()
+{
+	Matrix mat1{ 3 };
+	Matrix mat2{ 3 };
+
+	while (true) {
+		char c{ };
+		std::cin >> c;
+
+		system("cls");
+
+		if (isdigit(c)) {
+			int r = static_cast<int>(c - 48);
+			if (r > 9 or r < 1) {
+				std::cout << "숫자가 너무 크거나 작습니다." << std::endl;
+				continue;
+			}
+
+			mat1.print();
+			std::cout << "* " << r << " = " << std::endl;
+			mat1 *= r;
+			mat1.print();
+			continue;
+		}
+
+		Matrix newMat{ };
+		switch (c) {
+		case 'm':
+			mat1.printOper(mat2);
+			newMat = mat1 * mat2;
+			newMat.print();
+			break;
+		case 'a':
+			mat1.printOper(mat2);
+			newMat = mat1 + mat2;
+			newMat.print();
+			break;
+
+		case 'd':
+			mat1.printOper(mat2);
+			newMat = mat1 - mat2;
+			newMat.print();
+			break;
+
+		case 'h':
+			mat1.print();
+			std::cout << std::endl;
+			newMat = mat1.expansion();
+			newMat.print();
+			std::cout << std::endl;
+			std::cout << newMat.det() << std::endl;;
+			break;
+
+
+		case 't':
+			mat1.print();
+			std::cout << std::endl;
+			mat1.Trans();
+			mat1.print();
+			std::cout << std::endl;
+			std::cout << mat1.det() << std::endl;;
+			break;
+
+		case 'r':
+			mat1.print();
+			std::cout << std::endl;
+			std::cout << mat1.det() << std::endl;;
+			break;
+
+		case 's' :
+			mat1.print();
+			std::cout << std::endl;
+			mat1.reCreate();
+			mat1.print();
+			std::cout << std::endl;
+			break;
+
+		case 'q':
+			return 0;
+			break;
+		}
+	}
+}

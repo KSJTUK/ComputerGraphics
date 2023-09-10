@@ -1,9 +1,11 @@
 #pragma once
+#define _CRT_SECURE_NO_WARNINGS
 
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <sstream>
+#include <cstdlib>
 
 #define PATH "data.txt"
 
@@ -43,6 +45,106 @@ public:
 			}
 		}
 		return false;
+	}
+
+	void digitToVec() {
+
+	}
+	
+	void plusNum(int plus) {
+
+		for (auto& e : modifyStrs) {
+			if (e.empty()) {
+				return;
+			}
+
+			std::istringstream iss{ e };
+			std::string wordBuf{ };
+			std::vector<int> numVec{ };
+			std::vector<std::string> strVec{ };
+			std::vector<bool> sequenceWord{ };
+			while (iss >> wordBuf) {
+				if (isDigit(wordBuf)) {
+					numVec.push_back(atoi(wordBuf.c_str()) + 1);
+					sequenceWord.push_back(false);
+				}
+				else {
+					strVec.push_back(wordBuf);
+					sequenceWord.push_back(true);
+				}
+			}
+
+			e.clear();
+			size_t wordSeq{ };
+			size_t numSeq{ };
+			for (auto eS : sequenceWord) {
+				std::string input{ };
+				if (eS) {
+					input = strVec[wordSeq];
+					wordSeq++;
+				}
+				else {
+					char str[100];
+					_itoa_s(numVec[numSeq], str, 10);
+					input = str;
+					numSeq++;
+				}
+				input += " ";
+				e += input;
+			}
+
+			e.pop_back();
+		}
+	}
+
+	void minusNum(int minus) {
+
+		for (auto& e : modifyStrs) {
+			if (e.empty()) {
+				return;
+			}
+
+			std::istringstream iss{ e };
+			std::string wordBuf{ };
+			std::vector<int> numVec{ };
+			std::vector<std::string> strVec{ };
+			std::vector<bool> sequenceWord{ };
+			while (iss >> wordBuf) {
+				if (isDigit(wordBuf)) {
+					int num = atoi(wordBuf.c_str()) - 1;
+					if (num < 0) {
+						num = 0;
+					}
+					numVec.push_back(num);
+					sequenceWord.push_back(false);
+				}
+				else {
+					strVec.push_back(wordBuf);
+					sequenceWord.push_back(true);
+				}
+			}
+
+			e.clear();
+			size_t wordSeq{ };
+			size_t numSeq{ };
+			for (auto eS : sequenceWord) {
+				std::string input{ };
+				if (eS) {
+					input = strVec[wordSeq];
+					wordSeq++;
+				}
+				else {
+					char str[100];
+					_itoa_s(numVec[numSeq], str, 10);
+					input = str;
+					numSeq++;
+				}
+				input += " ";
+				e += input;
+			}
+
+			e.pop_back();
+		}
 	}
 
 	bool read() {
@@ -223,21 +325,56 @@ void solution2()
 	std::cout << "word count: " << fr.getNumWord() << "\n";
 	std::cout << "number count: " << fr.getNumDigit() << "\n";
 	std::cout << "Capital word: " << fr.getNumCaps() << "\n";
-	
-	fr.reverseLine();
-	fr.printModify();
-	fr.reverseLine();
-	fr.printModify();
-	fr.replaceAll('i', 'K');
-	fr.printModify();
-	fr.replaceAll('K', 'i');
-	fr.printModify();
-	fr.inputCh('@', 3, 2);
-	fr.printModify();
-	fr.eraseCh('@');
-	fr.printModify();
-	fr.equalWhere();
 
-	fr.reverseWord();
-	fr.printModify();
+	bool erase{ false };
+
+	while (true) {
+
+		char c{ };
+		std::cin >> c;
+
+		char tg{ }, rep{ };
+
+		system("cls");
+
+		switch (c) {
+		case 'd':
+			fr.reverseLine();
+			fr.printModify();
+			break;
+		case 'e':
+			if (erase) {
+				fr.eraseCh('@');
+			}
+			else {
+				fr.inputCh('@', 3, 2);
+			}
+			erase = !erase;
+			fr.printModify();
+			break;
+		case 'f':
+			fr.reverseWord();
+			fr.printModify();
+			break;
+		case 'g':
+			std::cin >> tg >> rep;
+			fr.replaceAll(tg, rep);
+			fr.printModify();
+			break;
+		case 'h':
+			fr.equalWhere();
+			break;
+		case '+':
+			fr.plusNum(1);
+			fr.printModify();
+			break;
+		case '-':
+			fr.minusNum(1);
+			fr.printModify();
+			break;
+		case 'q':
+			return;
+			break;
+		}
+	}
 }
